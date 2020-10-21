@@ -1,0 +1,27 @@
+<Html>
+
+    <form action="/search" method="GET">
+        <input type=text name="searchuser" placeholder="Search Friend">
+        <input type="submit" value="Search">
+    </form>
+  
+    <br>
+
+
+    <H1>Hi Im<% username.forEach(function (user) { %></H1>
+        <H3>
+            <%= user.FName %>
+            <%= user.LName %>
+        </H3>
+        <% }) %>
+
+
+        <img src="/image.png" height="200" width="200">
+
+        <form method="POST" action="/upload"   enctype="multipart/form-data">
+            <input type="file" name="image">
+            <input type="submit" value="upload">    
+
+        </form>
+
+</Html>
