@@ -1,4 +1,44 @@
 <Html>
+    <style>
+        .card {
+  box-shadow: 0 25px 25px 0  rgba(5, 20, 226, 0.2);
+  max-width: 300px;
+  margin: auto;
+  text-align: center;
+  border-radius: 25px;
+}
+
+.title {
+  color: rgb(43, 41, 41);
+  font-size: 18px;
+}
+
+button {
+    border-radius: 25px;
+  border: none;
+  outline: 0;
+  display: inline-block;
+  padding: 8px;
+  color: white;
+  background-color: rgb(9, 35, 153);
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  font-size: 18px;
+}
+
+a {
+  text-decoration: none;
+  font-size: 22px;
+  color: black;
+}
+
+button:hover, a:hover {
+  opacity: 0.7;
+}
+    </style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <form action="/search" method="GET">
         <input type=text name="searchuser" placeholder="Search Friend">
@@ -8,14 +48,33 @@
     <br>
 
 
-    <H1>Hi Im<% username.forEach(function (user) { %></H1>
+    <!-- <H1>Hi Im<% username.forEach(function (user) { %></H1>
         <H3>
             <%= user.FName %>
-            <%= user.LName %>
+            <%= user.LName %><br>
+            <%= user.Email %>
         </H3>
-        <% }) %>
+        
 
 
-        <img src="/image.png" height="200" width="200">
+        <img src="/images/<%= user.Profiles %>" height="200" width="200">
+
+        <% }) %> -->
+
+
+        <% username.forEach(function (user) { %>
+
+            <div class="card">
+               <img src="/images/<%= user.Profiles %>"  style="width:100%">
+               <h1><%= user.FName %>  
+                   <%= user.LName %></h1>
+               <p class="title"> <%= user.Email %></p>
+               <a href="#"><i class="fa fa-dribbble"></i></a>
+               <a href="#"><i class="fa fa-twitter"></i></a>
+               <a href="#"><i class="fa fa-linkedin"></i></a>
+               <a href="#"><i class="fa fa-facebook"></i></a>
+               <p><button>Contact</button></p>
+             </div>
+             <% }) %>
 
 </Html>

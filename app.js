@@ -47,7 +47,7 @@ app.post('/signup',(req,res)=>{
     let query=db.query(sql,user,(err,result)=>{
         if(err) throw err;
         console.log(req.body);
-         res.send("success");
+        res.sendFile(path.join(__dirname,'static','UserRegForm.html'));
       
     })
 })
@@ -62,7 +62,7 @@ app.get('/loginForm',(req,res)=>{
 app.get('/login',(req,res)=>{
     let Email=req.query.Email;
     let Password=req.query.Password;
-    var sql="SELECT FName,LName,Email FROM users WHERE Email = ? AND Password = ?";
+    var sql="SELECT FName,LName,Email,Profiles FROM users WHERE Email = ? AND Password = ?";
     db.query(sql,[Email,Password],(err,result)=>{
         if(err) throw err;
         console.log(result);
@@ -75,11 +75,12 @@ app.get('/login',(req,res)=>{
 app.get("/search",(req,res)=>{
     let nuser=req.query.searchuser;
 
-    var sql="SELECT FName,LName FROM users WHERE FName= ? ";
+    var sql="SELECT FName,LName,Email,Profiles FROM users WHERE FName= ? ";
     db.query(sql,nuser,(err,result)=>{
         if(err) throw err;
         console.log(result);
         res.render("others",{username:result});
+        
     })
 })
 
@@ -96,32 +97,48 @@ const handleError = (err, res) => {
   });
 
 
-app.post("/upload",upload.single("file"),(req,res)=>{
-    const tempPath = req.file.path;
-    const targetPath = path.join(__dirname, "./images/Screenshot (440).png");
-    if (path.extname(req.file.originalname).toLowerCase() === ".png") {
-        fs.rename(tempPath, targetPath, err => {
-          if (err) return handleError(err, res);
-  
-          res
+app.post("/upload",upload.single("image"),(req,res)=>{
+    var tempPath = req.file.path;
+    let email=req.body.finder;
+
+    let pathnew=tempPath.substr(7,tempPath.length);
+
+    sql= 'UPDATE users SET Profiles=? WHERE Email= ?';
+    const targetPath = path.join(__dirname, "./images/:tempPath");
+    db.query(sql,[pathnew,email],(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+    });
+
+         res
             .status(200)
-            .contentType("text/plain")
-            .end("File uploaded!");
-        });
-      } else {
-        fs.unlink(tempPath, err => {
-          if (err) return handleError(err, res);
+            .sendFile(path.join(__dirname,'static','login.html'));
+    
+
+    // if (path.extname(req.file.originalname).toLowerCase() === ".jpeg") {
+    //     fs.rename(tempPath, targetPath, err => {
+    //       if (err) return handleError(err, res);
   
-          res
-            .status(403)
-            .contentType("text/plain")
-            .end("Only .png files are allowed!");
-        });
-      }
+    //       res
+    //         .status(200)
+    //         .contentType("text/plain")
+    //         .send("File uploaded!");
+    //     });
+    //   } else {
+    //     fs.unlink(tempPath, err => {
+    //       if (err) return handleError(err, res);
+  
+    //       res
+    //         .status(403)
+    //         .contentType("text/plain")
+    //         .end("Only .png files are allowed!");
+    //     });
+    //   }
 });
 
-app.get("/image.png", (req, res) => {
-    res.sendFile(path.join(__dirname, "./images/Screenshot (440).png"));
+app.get("/images/:id", (req, res) => {
+    let s1 = "./images/" + req.params.id;
+    res.sendFile(path.join(__dirname, s1));
   });
 
 
