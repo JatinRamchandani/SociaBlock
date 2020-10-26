@@ -42,7 +42,10 @@ app.get('/',(req,res)=>{
 app.post('/signup',(req,res)=>{
     
     let user=req.body;
+    let userFName=req.body.fname
     let sql='INSERT INTO users SET ?';
+
+    let sql2 = "CREATE TABLE "+userFName+" (id INT AUTO_INCREMENT PRIMARY KEY, Image VARCHAR(255))";
 
     let query=db.query(sql,user,(err,result)=>{
         if(err) throw err;
@@ -50,6 +53,10 @@ app.post('/signup',(req,res)=>{
         res.sendFile(path.join(__dirname,'static','UserRegForm.html'));
       
     })
+    db.query(sql2,(err, result)=>{
+        if (err) throw err;
+        console.log("Table created");
+      })
 })
 
 app.get('/loginForm',(req,res)=>{
@@ -147,6 +154,9 @@ app.get("/photos/:name/:profile",(req,res)=>{
     let photo=req.params.profile;
     res.render("photos",{username:para,userphoto:photo});
 })
+
+
+
 
 
 app.listen(3000);
