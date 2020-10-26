@@ -104,7 +104,7 @@ app.post("/upload",upload.single("image"),(req,res)=>{
     let pathnew=tempPath.substr(7,tempPath.length);
 
     sql= 'UPDATE users SET Profiles=? WHERE Email= ?';
-    const targetPath = path.join(__dirname, "./images/:tempPath");
+    const targetPath = path.join(__dirname, "./images/:tempPath.jpg");
     db.query(sql,[pathnew,email],(err,result)=>{
         if(err) throw err;
         console.log(result);
@@ -140,6 +140,13 @@ app.get("/images/:id", (req, res) => {
     let s1 = "./images/" + req.params.id;
     res.sendFile(path.join(__dirname, s1));
   });
+
+
+app.get("/photos/:name/:profile",(req,res)=>{
+    let para=req.params.name;
+    let photo=req.params.profile;
+    res.render("photos",{username:para,userphoto:photo});
+})
 
 
 app.listen(3000);
