@@ -156,6 +156,23 @@ app.get("/photos/:name/:profile",(req,res)=>{
 })
 
 
+app.post("/uploadphotos/:name",upload.single("image"),(req,res)=>{
+    let newtempPath = req.file.path;
+    let toAdd=req.params.name;
+
+    let newpathnew=newtempPath.substr(7,newtempPath.length);
+
+    sql= 'INSERT INTO '+ toAdd +' SET Image = ?';
+    const targetPath = path.join(__dirname, "./individualImages/:newtempPath.jpg");
+    db.query(sql,newpathnew,(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+    });
+
+         res
+            .status(200)
+            .render("photos");
+})
 
 
 
