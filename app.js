@@ -152,13 +152,23 @@ app.get("/images/:id", (req, res) => {
 app.get("/photos/:name/:profile",(req,res)=>{
     let para=req.params.name;
     let photo=req.params.profile;
-    res.render("photos",{username:para,userphoto:photo});
+
+    var sql="SELECT Image FROM "+para;
+
+    db.query(sql,(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+        res.render("photos",{username:para,userphoto:photo,all:result});
+    })
+
+   
 })
 
 
-app.post("/uploadphotos/:name",upload.single("image"),(req,res)=>{
+app.post("/uploadphotos/:name/:profile",upload.single("image"),(req,res)=>{
     let newtempPath = req.file.path;
     let toAdd=req.params.name;
+    let photo=req.params.profile;
 
     let newpathnew=newtempPath.substr(7,newtempPath.length);
 
@@ -169,9 +179,19 @@ app.post("/uploadphotos/:name",upload.single("image"),(req,res)=>{
         console.log(result);
     });
 
-         res
+    var sql="SELECT Image FROM "+toAdd;
+
+    db.query(sql,(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+        res
             .status(200)
-            .render("photos");
+            .render("photos",{username:toAdd,userphoto:photo,all:result});
+    })
+
+        //  res
+        //     .status(200)
+        //     .render("photos",{username:toAdd,userphoto:photo});
 })
 
 
