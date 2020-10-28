@@ -1,0 +1,20 @@
+<html>
+    <h1>Post Area</h1>
+    
+        
+
+
+
+        <table border="0" cellspacing="20">
+        <% allresults.forEach(function (result) { %>
+
+        <tr>
+            <th><%= result.Email %></th>
+            <td><%= result.Post %></td>
+        </tr>
+        <% }) %>
+        </table>
+        
+
+       
+</html>

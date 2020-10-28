@@ -36,7 +36,7 @@ db.connect((err)=>{
 
 app.get('/',(req,res)=>{
     console.log(req.params);
-   res.sendFile(path.join(__dirname,'static','UserRegForm.html'));
+    res.sendFile(path.join(__dirname,'static','UserRegForm.html'));
 })
 
 app.post('/signup',(req,res)=>{
@@ -44,6 +44,7 @@ app.post('/signup',(req,res)=>{
     let user=req.body;
     let userFName=req.body.fname
     let sql='INSERT INTO users SET ?';
+    
 
     let sql2 = "CREATE TABLE "+userFName+" (id INT AUTO_INCREMENT PRIMARY KEY, Image VARCHAR(255))";
 
@@ -65,15 +66,28 @@ app.get('/loginForm',(req,res)=>{
 });
 
 
-
-app.get('/login',(req,res)=>{
-    let Email=req.query.Email;
-    let Password=req.query.Password;
+app.get("/login1/:email/:pass",(req,res)=>{
+    let Email=req.params.email;
+    let Password=req.params.pass;
     var sql="SELECT FName,LName,Email,Profiles FROM users WHERE Email = ? AND Password = ?";
     db.query(sql,[Email,Password],(err,result)=>{
         if(err) throw err;
         console.log(result);
         res.render("profile",{username:result});
+    });
+    
+
+})
+
+
+app.get('/login',(req,res)=>{
+    let Email=req.query.Email;
+    let Password=req.query.Password;
+    var sql="SELECT FName,LName,Email,Password,Profiles FROM users WHERE Email = ? AND Password = ?";
+    db.query(sql,[Email,Password],(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+        res.render("wall",{username:result});
     });
 });
 
@@ -192,6 +206,42 @@ app.post("/uploadphotos/:name/:profile",upload.single("image"),(req,res)=>{
         //  res
         //     .status(200)
         //     .render("photos",{username:toAdd,userphoto:photo});
+})
+
+
+app.get("/addPosts",(req,res)=>{
+    res.sendFile(path.join(__dirname,"static","addPosts.html"));
+})
+
+
+app.post("/storePost",(req,res)=>{
+    let pos=req.body;
+
+    var sql="INSERT INTO posts SET ? ";
+
+    db.query(sql,pos,(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+    });
+
+
+    var sql2="SELECT * FROM posts ORDER BY Id DESC";
+    db.query(sql2,(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+        res.render("posts",{allresults:result});
+    });
+})
+
+
+app.get("/wallposts",(req,res)=>{
+    
+    var sql2="SELECT * FROM posts ORDER BY Id DESC";
+    db.query(sql2,(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+        res.render("posts",{allresults:result});
+    });
 })
 
 
