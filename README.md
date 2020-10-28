@@ -1,4 +1,4 @@
 # SociaBlock
 
-Under development currently
+* Social Media website 
 
