@@ -6,19 +6,20 @@
 
     <H1><%= username %>'s photos</H1>
     <form method="POST" action="/uploadphotos/<%= username %>/<%= userphoto %>"   enctype="multipart/form-data">
-        <input type="file" name="image">
+        <input type="file" name="image" required>
         <input type="submit" value="Upload New">    
 
     </form>
     <br>
-    <table width=200 height=200>
+    <table style="width: 100%;height: 100%">
         
         <tr>
-            <td><img src="/images/<%= userphoto %>"  style="width:100%" width></td>
+            <td><img src="/images/<%= userphoto %>"  style="width:inherit;height: 200px" ></td>
         </tr>
         <% all.forEach(function (a) { %>
         <tr>
-            <td><img src="/images/<%= a.Image %>"   style="width:40%"></td>
+            <td><img src="/images/<%= a.Image %>"   style="width:inherit;height: 200px">
+            <form method=post action="/images/delete/<%= username %>/<%= userphoto %>/<%= a.Image %>"><input type=submit value="delete"></form></td>
         </tr>
        
     </table>

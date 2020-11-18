@@ -1,0 +1,26 @@
+<html>
+
+    
+
+    
+
+    <H1><%= username %>'s photos</H1>
+    <br>
+    <table style="width: 100%;height: 100%">
+        
+        <tr>
+            <td><img src="/images/<%= userphoto %>"  style="width:inherit;height: inherit" ></td>
+        </tr>
+        <% all.forEach(function (a) { %>
+        <tr>
+            <td><img src="/images/<%= a.Image %>"   style="width:inherit;height: inherit">
+              </tr>
+       
+    </table>
+
+    <% }) %>
+
+
+    
+
+</html>

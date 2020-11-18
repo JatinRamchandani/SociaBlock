@@ -41,14 +41,29 @@ app.get('/',(req,res)=>{
 
 app.post('/signup',(req,res)=>{
     
-    let user=req.body;
-    let userFName=req.body.fname
-    let sql='INSERT INTO users SET ?';
+    let userFName=req.body.fname;
+    let userLName=req.body.lname;
+    let userEmail=req.body.Email;
+    let userPass=req.body.password;
+    let date=req.body.date;
+    
+    let newmail="";
+    let sql='INSERT INTO users SET FName=?, LName=?, Email=? ,DOB= ?, Password= ?, Profiles=?, Imagetable=?';
+
+
+    for (var i =0;i<userEmail.length-4;i++){
+        if(userEmail.charAt(i)=='@'){
+            newmail+='$';
+        }
+        else{
+            newmail+=userEmail.charAt(i);
+        }
+    }
     
 
-    let sql2 = "CREATE TABLE "+userFName+" (id INT AUTO_INCREMENT PRIMARY KEY, Image VARCHAR(255))";
+    let sql2 = "CREATE TABLE "+newmail+" (id INT AUTO_INCREMENT PRIMARY KEY, Image VARCHAR(255))";
 
-    let query=db.query(sql,user,(err,result)=>{
+    let query=db.query(sql,[userFName,userLName,userEmail,date,userPass,,newmail],(err,result)=>{
         if(err) throw err;
         console.log(req.body);
         res.sendFile(path.join(__dirname,'static','UserRegForm.html'));
@@ -118,9 +133,9 @@ const handleError = (err, res) => {
   });
 
 
-app.post("/upload",upload.single("image"),(req,res)=>{
+app.post("/upload/:email",upload.single("image"),(req,res)=>{
     var tempPath = req.file.path;
-    let email=req.body.finder;
+    let email=req.params.email;
 
     let pathnew=tempPath.substr(7,tempPath.length);
 
@@ -131,9 +146,15 @@ app.post("/upload",upload.single("image"),(req,res)=>{
         console.log(result);
     });
 
-         res
+    sql2= 'SELECT * FROM users WHERE Email= ?';
+    db.query(sql2,email,(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+        res
             .status(200)
-            .sendFile(path.join(__dirname,'static','login.html'));
+            .render("profile",{username:result});
+    });
+         
     
 
     // if (path.extname(req.file.originalname).toLowerCase() === ".jpeg") {
@@ -163,11 +184,59 @@ app.get("/images/:id", (req, res) => {
   });
 
 
-app.get("/photos/:name/:profile",(req,res)=>{
-    let para=req.params.name;
-    let photo=req.params.profile;
 
-    var sql="SELECT Image FROM "+para;
+app.post("/images/delete/:name/:profile/:image",(req,res)=>{
+    let email=req.params.name;
+    let image=req.params.image;
+    let profile=req.params.profile;
+
+    let newmail="";
+    
+    for (var i =0;i<email.length-4;i++){
+        if(email.charAt(i)=='@'){
+            newmail+='$';
+        }
+        else{
+            newmail+=email.charAt(i);
+        }
+    }
+
+    var sql="DELETE FROM "+ newmail +" WHERE Image = ? " ;
+
+    db.query(sql,image,(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+    })
+
+    
+    var sql="SELECT Image FROM "+newmail;
+
+    db.query(sql,(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+        res
+            .status(200)
+            .render("photos",{username:email,userphoto:profile,all:result});
+    })
+});
+
+
+
+app.get("/photos/:email/:profile",(req,res)=>{
+    let para=req.params.email;
+    let photo=req.params.profile;
+    let newmail="";
+    
+    for (var i =0;i<para.length-4;i++){
+        if(para.charAt(i)=='@'){
+            newmail+='$';
+        }
+        else{
+            newmail+=para.charAt(i);
+        }
+    }
+
+    var sql="SELECT Image FROM "+newmail;
 
     db.query(sql,(err,result)=>{
         if(err) throw err;
@@ -179,21 +248,60 @@ app.get("/photos/:name/:profile",(req,res)=>{
 })
 
 
-app.post("/uploadphotos/:name/:profile",upload.single("image"),(req,res)=>{
-    let newtempPath = req.file.path;
-    let toAdd=req.params.name;
+app.get("/othersphotos/:email/:profile",(req,res)=>{
+    let para=req.params.email;
     let photo=req.params.profile;
+    let newmail="";
+    
+    for (var i =0;i<para.length-4;i++){
+        if(para.charAt(i)=='@'){
+            newmail+='$';
+        }
+        else{
+            newmail+=para.charAt(i);
+        }
+    }
+    var sql="SELECT Image FROM "+newmail;
+
+    db.query(sql,(err,result)=>{
+        if(err) throw err;
+        console.log(result);
+        res.render("othersPhotos",{username:para,userphoto:photo,all:result});
+    })
+
+   
+})
+
+
+app.post("/uploadphotos/:email/:profile",upload.single("image"),(req,res)=>{
+    let newtempPath = req.file.path;
+    let toAdd=req.params.email;
+    let photo=req.params.profile;
+
+    let newmail="";
+
+    for (var i =0;i<toAdd.length-4;i++){
+        if(toAdd.charAt(i)=='@'){
+            newmail+='$';
+        }
+        else{
+            newmail+=toAdd.charAt(i);
+        }
+    }
+
+    
 
     let newpathnew=newtempPath.substr(7,newtempPath.length);
 
-    sql= 'INSERT INTO '+ toAdd +' SET Image = ?';
+    sql= 'INSERT INTO '+ newmail +' SET Image = ?';
     const targetPath = path.join(__dirname, "./individualImages/:newtempPath.jpg");
     db.query(sql,newpathnew,(err,result)=>{
         if(err) throw err;
         console.log(result);
     });
 
-    var sql="SELECT Image FROM "+toAdd;
+   
+    var sql="SELECT Image FROM "+newmail;
 
     db.query(sql,(err,result)=>{
         if(err) throw err;
@@ -242,6 +350,33 @@ app.get("/wallposts",(req,res)=>{
         console.log(result);
         res.render("posts",{allresults:result});
     });
+})
+
+
+app.get("/myposts/:email",(req,res)=>{
+    
+    let email=req.params.email;
+    sql="SELECT * FROM posts WHERE Email = ?";
+    db.query(sql,email,(err,result)=>{
+        if (err) throw err;
+        console.log(result);
+
+        res.render("myposts",{all:result})
+
+    })
+})
+
+app.get("/othersmyposts/:email",(req,res)=>{
+    
+    let email=req.params.email;
+    sql="SELECT * FROM posts WHERE Email = ?";
+    db.query(sql,email,(err,result)=>{
+        if (err) throw err;
+        console.log(result);
+
+        res.render("othersmyposts",{all:result})
+
+    })
 })
 
 
